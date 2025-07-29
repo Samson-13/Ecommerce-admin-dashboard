@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import AddButton from "../../components/AddButton";
+import { useState } from "react";
+import ProductModal from "./ProductModal";
 
 const products = [
   {
@@ -34,6 +37,7 @@ const products = [
 ];
 
 export default function Products() {
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -42,10 +46,9 @@ export default function Products() {
         <main className="flex-1 p-10">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-semibold text-gray-800">Products</h2>
-            <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-md shadow cursor-pointer hover:bg-blue-700 transition">
-              + Add Product
-            </button>
+            <AddButton label="Add Product" onClick={() => setOpen(true)} />
           </div>
+          {open && <ProductModal open={open} onClose={() => setOpen(false)} />}
 
           <div className="bg-white shadow-lg rounded-xl overflow-hidden">
             <table className="w-full text-sm text-left text-gray-700">
