@@ -6,16 +6,8 @@ import {
   Tags,
   Star,
   Image,
-  ShoppingBasket,
-  Heart,
-  UserCircle,
   ShieldCheck,
-  FileText,
-  ClipboardList,
-  Phone,
   Settings,
-  ListOrdered,
-  BarChart2,
 } from "lucide-react";
 
 import { Link, useLocation } from "react-router-dom";
@@ -51,16 +43,7 @@ const navSections = [
         label: "Orders",
         icon: <ShoppingCart className="w-5 h-5" />,
       },
-      {
-        to: "/carts",
-        label: "Carts",
-        icon: <ShoppingBasket className="w-5 h-5" />,
-      },
-      {
-        to: "/wishlists",
-        label: "Wishlists",
-        icon: <Heart className="w-5 h-5" />,
-      },
+
       { to: "/reviews", label: "Reviews", icon: <Star className="w-5 h-5" /> },
     ],
   },
@@ -68,35 +51,11 @@ const navSections = [
     title: "Users",
     links: [
       { to: "/users", label: "Users", icon: <Users className="w-5 h-5" /> },
-      {
-        to: "/profiles",
-        label: "User Profiles",
-        icon: <UserCircle className="w-5 h-5" />,
-      },
+
       {
         to: "/permissions",
         label: "Permissions",
         icon: <ShieldCheck className="w-5 h-5" />,
-      },
-    ],
-  },
-  {
-    title: "Content",
-    links: [
-      {
-        to: "/privacy-policy",
-        label: "Privacy Policy",
-        icon: <FileText className="w-5 h-5" />,
-      },
-      {
-        to: "/terms",
-        label: "Terms & Conditions",
-        icon: <ClipboardList className="w-5 h-5" />,
-      },
-      {
-        to: "/contacts",
-        label: "Contacts",
-        icon: <Phone className="w-5 h-5" />,
       },
     ],
   },
@@ -108,12 +67,6 @@ const navSections = [
         label: "Settings",
         icon: <Settings className="w-5 h-5" />,
       },
-      { to: "/logs", label: "Logs", icon: <ListOrdered className="w-5 h-5" /> },
-      {
-        to: "/reports",
-        label: "Reports",
-        icon: <BarChart2 className="w-5 h-5" />,
-      },
     ],
   },
 ];
@@ -123,7 +76,7 @@ export default function Sidebar() {
 
   return (
     <aside className="w-60 min-h-screen bg-white shadow-sm">
-      <div className="text-xl font-bold text-blue-700 px-6 py-5 text-center border-b">
+      <div className="text-xl font-bold text-blue-700 px-6 py-5 text-center">
         Admin
       </div>
 
