@@ -1,5 +1,5 @@
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
 import { Trash2 } from "lucide-react";
 
 const reviews = [
@@ -9,7 +9,6 @@ const reviews = [
     email: "amit@example.com",
     product: "Vintage Denim Jacket",
     rating: 4,
-    comment: "Great quality, perfect fit!",
     date: "2025-07-27",
   },
   {
@@ -18,7 +17,6 @@ const reviews = [
     email: "neha@example.com",
     product: "Oversized Cotton T-Shirt",
     rating: 5,
-    comment: "Very comfortable and soft fabric.",
     date: "2025-07-25",
   },
   {
@@ -27,7 +25,6 @@ const reviews = [
     email: "rahul@example.com",
     product: "Minimalist Tote Bag",
     rating: 3,
-    comment: "Design is good but material could be better.",
     date: "2025-07-20",
   },
 ];
@@ -53,7 +50,6 @@ export default function Reviews() {
                   <th className="px-6 py-4">Email</th>
                   <th className="px-6 py-4">Product</th>
                   <th className="px-6 py-4">Rating</th>
-                  <th className="px-6 py-4">Comment</th>
                   <th className="px-6 py-4">Date</th>
                   <th className="px-6 py-4 text-center">Actions</th>
                 </tr>
@@ -72,12 +68,7 @@ export default function Reviews() {
                         {review.rating} ★
                       </span>
                     </td>
-                    <td
-                      className="px-6 py-4 max-w-sm truncate"
-                      title={review.comment}
-                    >
-                      {review.comment}
-                    </td>
+
                     <td className="px-6 py-4">{review.date}</td>
                     <td className="px-6 py-4 text-center">
                       <button

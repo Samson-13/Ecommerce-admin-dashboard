@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import Products from "./pages/Product/Product";
 import Categories from "./pages/Categories/Categories";
-import Orders from "./pages/Orders";
-import Reviews from "./pages/Reviews";
+import Orders from "./pages/Orders/Orders";
+import Reviews from "./pages/Reviews/Reviews";
 import Users from "./pages/Users/Users";
 import Permissions from "./pages/Users/Permissions";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Settings/Settings";
 import Banners from "./pages/Banners/Banners";
 
 export default function App() {

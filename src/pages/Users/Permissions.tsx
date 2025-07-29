@@ -1,6 +1,9 @@
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import { Pencil } from "lucide-react";
+import AddButton from "../../components/AddButton";
+import PermissionsModal from "./PermissionsModal";
+import { useState } from "react";
 
 const roles = [
   {
@@ -20,6 +23,8 @@ const roles = [
 ];
 
 export default function Permissions() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -30,10 +35,11 @@ export default function Permissions() {
             <h2 className="text-3xl font-semibold text-gray-800">
               Permissions
             </h2>
-            <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-md shadow cursor-pointer hover:bg-blue-700 transition">
-              + Add Role
-            </button>
+            <AddButton label="Add Permissions" onClick={() => setOpen(true)} />
           </div>
+          {open && (
+            <PermissionsModal open={open} onClose={() => setOpen(false)} />
+          )}
 
           <div className="bg-white shadow-lg rounded-xl overflow-hidden">
             <table className="w-full text-sm text-left text-gray-700">

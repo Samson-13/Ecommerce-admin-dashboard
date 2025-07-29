@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function PermissionsModal({
+export default function SettingsModal({
   open,
   onClose,
   initialData,
@@ -8,19 +8,18 @@ export default function PermissionsModal({
   open: boolean;
   onClose: () => void;
   initialData?: {
-    role: string;
-    canEdit: boolean;
-    canDelete: boolean;
-    canViewReports: boolean;
+    title: string;
+    slug: string;
   };
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [role, setRole] = useState(initialData?.role || "");
-  const [canEdit, setCanEdit] = useState(initialData?.canEdit ?? true);
-  const [canDelete, setCanDelete] = useState(initialData?.canDelete ?? true);
-  const [canViewReports, setCanViewReports] = useState(
-    initialData?.canViewReports ?? true
-  );
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+
+  useEffect(() => {
+    setTitle(initialData?.title || "");
+    setSlug(initialData?.slug || "");
+  }, [initialData]);
 
   if (!open) return null;
 
@@ -32,8 +31,7 @@ export default function PermissionsModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Submit logic here
-    console.log({ role, canEdit, canDelete, canViewReports });
+    console.log({ title, slug });
     onClose();
   };
 
@@ -48,7 +46,7 @@ export default function PermissionsModal({
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-800">
-            {initialData ? "Edit Role" : "Add New Role"}
+            {initialData ? "Edit Page" : "Add New Page"}
           </h2>
           <button
             onClick={onClose}
@@ -61,55 +59,37 @@ export default function PermissionsModal({
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role Name
+              Page Title
             </label>
             <input
               type="text"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              placeholder="e.g. Manager"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter page title"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
-          <div className="space-y-3">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Permissions
+              Slug
             </label>
-            <div className="space-y-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={canEdit}
-                  onChange={(e) => setCanEdit(e.target.checked)}
-                />
-                Can Edit
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={canDelete}
-                  onChange={(e) => setCanDelete(e.target.checked)}
-                />
-                Can Delete
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={canViewReports}
-                  onChange={(e) => setCanViewReports(e.target.checked)}
-                />
-                Can View Reports
-              </label>
-            </div>
+            <input
+              type="text"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="e.g. privacy-policy"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition cursor-pointer"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
             >
               Cancel
             </button>
@@ -117,7 +97,7 @@ export default function PermissionsModal({
               type="submit"
               className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium cursor-pointer"
             >
-              Save Role
+              Save Page
             </button>
           </div>
         </form>

@@ -9,16 +9,16 @@
 // import RevenueForecastChart from "./../components/RevenueForecastChart";
 // import PerformancePanel from "../components/PerformancePanel";
 // import Sidebar from "../components/Sidebar";
-import AnnualProfitChart from "../components/AnnualProfitChart";
-import SalesOverviewPanel from "../components/SalesOverviewPanel";
-import SettlementsCard from "../components/SettlementsCard";
-import RevenueByProductTable from "../components/RevenueByProductTable";
-import CustomersPanel from "../components/CustomersPanel";
-import PerformancePanel from "../components/PerformancePanel";
-import RevenueForecastChart from "../components/RevenueForecastChart";
-import SummaryCards from "../components/SummaryCards";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+import AnnualProfitChart from "../../components/AnnualProfitChart";
+import SalesOverviewPanel from "../../components/SalesOverviewPanel";
+import SettlementsCard from "../../components/SettlementsCard";
+import RevenueByProductTable from "../../components/RevenueByProductTable";
+import CustomersPanel from "../../components/CustomersPanel";
+import PerformancePanel from "../../components/PerformancePanel";
+import RevenueForecastChart from "../../components/RevenueForecastChart";
+import SummaryCards from "../../components/SummaryCards";
+import Header from "../../components/Header";
+import Sidebar from "../../components/Sidebar";
 
 export default function Dashboard() {
   return (

@@ -1,6 +1,9 @@
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
 import { Pencil, Trash2 } from "lucide-react";
+import AddButton from "../../components/AddButton";
+import SettingsModal from "./SettingsModal";
+import { useState } from "react";
 
 const pages = [
   {
@@ -24,6 +27,8 @@ const pages = [
 ];
 
 export default function Settings() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -34,11 +39,9 @@ export default function Settings() {
             <h2 className="text-3xl font-semibold text-gray-800">
               Settings Pages
             </h2>
-            <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-md shadow cursor-pointer hover:bg-blue-700 transition">
-              + Add Page
-            </button>
+            <AddButton label="Add Pages" onClick={() => setOpen(true)} />
           </div>
-
+          {open && <SettingsModal open={open} onClose={() => setOpen(false)} />}
           <div className="bg-white shadow-lg rounded-xl overflow-hidden">
             <table className="w-full text-sm text-left text-gray-700">
               <thead className="bg-purple-50 text-gray-600 uppercase text-xs">
