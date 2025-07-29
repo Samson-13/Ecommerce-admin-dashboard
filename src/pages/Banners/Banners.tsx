@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import AddButton from "../../components/AddButton";
+import BannersModal from "./BannersModal";
+import { useState } from "react";
 
 const banners = [
   {
@@ -20,6 +23,8 @@ const banners = [
 ];
 
 export default function Banners() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -28,11 +33,9 @@ export default function Banners() {
         <main className="flex-1 p-10">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-semibold text-gray-800">Banners</h2>
-            <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-full shadow cursor-pointer hover:bg-blue-700 transition">
-              + Add Banner
-            </button>
+            <AddButton label="Add Categories" onClick={() => setOpen(true)} />
           </div>
-
+          {open && <BannersModal open={open} onClose={() => setOpen(false)} />}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {banners.map((banner) => (
               <div

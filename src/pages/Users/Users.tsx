@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import AddButton from "../../components/AddButton";
+import UserModal from "./UsersModal";
+import { useState } from "react";
 
 const users = [
   {
@@ -20,6 +23,8 @@ const users = [
 ];
 
 export default function Users() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -28,10 +33,9 @@ export default function Users() {
         <main className="flex-1 p-10">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-semibold text-gray-800">Users</h2>
-            <button className="px-5 py-2 bg-blue-600 text-white text-sm rounded-md shadow cursor-pointer hover:bg-blue-700 transition">
-              + Add User
-            </button>
+            <AddButton label="Add Users" onClick={() => setOpen(true)} />
           </div>
+          {open && <UserModal open={open} onClose={() => setOpen(false)} />}
 
           <div className="bg-white shadow-lg rounded-xl overflow-hidden">
             <table className="w-full text-sm text-left text-gray-700">
