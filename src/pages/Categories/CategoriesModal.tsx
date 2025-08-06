@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function CategoriesModal({
   open,
@@ -9,13 +9,52 @@ export default function CategoriesModal({
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  if (!open) return null;
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+  const [status, setStatus] = useState("true");
+  const [loading, setLoading] = useState(false);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       onClose();
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const slug = name.trim().toLowerCase().replace(/\s+/g, "-");
+
+    const body = {
+      name,
+      description,
+      image,
+      slug,
+      status: status === "true",
+    };
+
+    try {
+      const res = await fetch("http://localhost:3000/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error("Failed to add category");
+
+      const result = await res.json();
+      console.log("Category created:", result);
+      onClose();
+    } catch (err) {
+      console.error("Error submitting category:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
 
   return (
     <div
@@ -32,47 +71,60 @@ export default function CategoriesModal({
           </h2>
         </div>
 
-        <form className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category Name
             </label>
             <input
               type="text"
-              placeholder="e.g. T-Shirts"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="e.g. Shoes"
+              disabled={loading}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price (₹)
-              </label>
-              <input
-                type="number"
-                placeholder="e.g. 1299"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <input
+              type="text"
+              value={description}
+              placeholder="e.g. Shoes and etc"
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Count
-              </label>
-              <input
-                type="number"
-                placeholder="e.g. 50"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Image URL
+            </label>
+            <input
+              placeholder="Choose an image"
+              type="text"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              disabled={loading}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
             </label>
-            <select className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              disabled={loading}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            >
               <option value="true">Active</option>
               <option value="false">Inactive</option>
             </select>
@@ -82,15 +134,21 @@ export default function CategoriesModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+              disabled={loading}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition font-medium"
+              disabled={loading}
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center cursor-pointer justify-center gap-2"
             >
-              Save Category
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "Save Category"
+              )}
             </button>
           </div>
         </form>
