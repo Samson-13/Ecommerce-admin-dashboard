@@ -9,7 +9,7 @@ type Product = {
   id: number;
   name: string;
   price: number;
-  available: boolean;
+  inStock: boolean;
   stock: number;
 };
 
@@ -48,7 +48,8 @@ export default function Products() {
           {open && (
             <ProductModal
               open={open}
-              onClose={() => {
+              onClose={() => setOpen(false)}
+              onProductAdded={() => {
                 fetchProducts();
                 setOpen(false);
               }}
@@ -88,12 +89,12 @@ export default function Products() {
                       <td className="px-6 py-4">
                         <span
                           className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                            product.available
+                            product.inStock
                               ? " text-green-700"
                               : " text-red-600"
                           }`}
                         >
-                          {product.available ? "In Stock" : "Out of Stock"}
+                          {product.inStock ? "In Stock" : "Out of Stock"}
                         </span>
                       </td>
                       <td className="px-6 py-4">{product.stock}</td>

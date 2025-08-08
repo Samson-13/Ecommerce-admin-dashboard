@@ -3,9 +3,11 @@ import { useRef, useState, useEffect } from "react";
 export default function ProductModal({
   open,
   onClose,
+  onProductAdded,
 }: {
   open: boolean;
   onClose: () => void;
+  onProductAdded: () => void;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +77,7 @@ export default function ProductModal({
 
       if (!res.ok) throw new Error("Failed to create product");
 
-      onClose();
+      onProductAdded();
     } catch (err) {
       console.error("Error:", err);
     } finally {
@@ -253,14 +255,14 @@ export default function ProductModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 bg-gray-100  rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 bg-gray-100  rounded-lg hover:bg-gray-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium cursor-pointer"
             >
               {loading ? "Saving..." : "Save Product"}
             </button>
