@@ -1,146 +1,151 @@
-import React, { useState, useEffect } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
+import AddButton from "../../components/AddButton";
+import { useEffect, useState } from "react";
+import ProductModal from "./ProductModal";
+import EditProduct from "./EditProduct";
 
 type Product = {
   id: number;
   name: string;
+  description: string;
+  images: string[];
   price: number;
+  categoryId: string;
   inStock: boolean;
+  tags: string[];
   stock: number;
 };
 
-type ProductModalProps = {
-  open: boolean;
-  onClose: () => void;
-  onProductAdded: () => void;
-  product: Product | null;
-};
+export default function Products() {
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
 
-export default function ProductModal({
-  open,
-  onClose,
-  onProductAdded,
-  product,
-}: ProductModalProps) {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState<number>(0);
-  const [inStock, setInStock] = useState(false);
-  const [stock, setStock] = useState<number>(0);
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:3000/api/products");
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error("Failed to fetch products", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (product) {
-      setName(product.name);
-      setPrice(product.price);
-      setInStock(product.inStock);
-      setStock(product.stock);
-    } else {
-      // Clear form when adding new product
-      setName("");
-      setPrice(0);
-      setInStock(false);
-      setStock(0);
-    }
-  }, [product]);
+    fetchProducts();
+  }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    const productData = { name, price, inStock, stock };
-
-    try {
-      if (product) {
-        await fetch(`http://localhost:3000/api/products/${product.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(productData),
-        });
-      } else {
-        // Add mode: send POST request to create new product
-        await fetch("http://localhost:3000/api/products", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(productData),
-        });
-      }
-      onProductAdded();
-    } catch (error) {
-      console.error("Failed to save product", error);
-    }
-  }
-
-  if (!open) return null;
+  const openEditModal = (product: Product) => {
+    setProductToEdit(product);
+    setEditOpen(true);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96">
-        <h2 className="text-xl font-semibold mb-4">
-          {product ? "Edit Product" : "Add Product"}
-        </h2>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 flex flex-col bg-gray-50">
+        <Header />
+        <main className="flex-1 p-10">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-semibold text-gray-800">Products</h2>
+            <AddButton label="Add Product" onClick={() => setAddOpen(true)} />
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full border px-3 py-2 rounded"
+          {/* Add Product Modal */}
+          {addOpen && (
+            <ProductModal
+              open={addOpen}
+              onClose={() => setAddOpen(false)}
+              onProductAdded={() => {
+                fetchProducts();
+                setAddOpen(false);
+              }}
             />
-          </div>
+          )}
 
-          <div>
-            <label className="block mb-1 font-medium">Price (₹)</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              required
-              className="w-full border px-3 py-2 rounded"
-              min={0}
-              step={0.01}
+          {/* Edit Product Modal */}
+          {editOpen && productToEdit && (
+            <EditProduct
+              open={editOpen}
+              onClose={() => setEditOpen(false)}
+              productToEdit={productToEdit}
+              onProductUpdated={() => {
+                fetchProducts();
+                setEditOpen(false);
+              }}
             />
-          </div>
+          )}
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={inStock}
-              onChange={(e) => setInStock(e.target.checked)}
-              id="inStock"
-            />
-            <label htmlFor="inStock" className="font-medium">
-              In Stock
-            </label>
-          </div>
+          <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+            {loading ? (
+              <div className="p-10 text-center text-gray-500">Loading...</div>
+            ) : products.length === 0 ? (
+              <div className="p-10 text-center text-gray-400">
+                No products found.
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left text-gray-700">
+                <thead className="bg-purple-50 text-gray-600 uppercase text-xs">
+                  <tr>
+                    <th className="px-6 py-4">#</th>
+                    <th className="px-6 py-4">Product Name</th>
+                    <th className="px-6 py-4">Price (₹)</th>
+                    <th className="px-6 py-4">Availability</th>
+                    <th className="px-6 py-4">Stock</th>
+                    <th className="px-6 py-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product, index) => (
+                    <tr
+                      key={product.id}
+                      className="border-t border-gray-200 hover:bg-gray-50 transition"
+                    >
+                      <td className="px-6 py-4 font-medium text-gray-500">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 font-medium">{product.name}</td>
+                      <td className="px-6 py-4">₹{product.price}</td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                            product.inStock ? "text-green-700" : "text-red-600"
+                          }`}
+                        >
+                          {product.inStock ? "In Stock" : "Out of Stock"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">{product.stock}</td>
+                      <td className="px-6 py-4 flex justify-center gap-3">
+                        <button
+                          className="p-2 rounded-full cursor-pointer"
+                          title="Edit"
+                          onClick={() => openEditModal(product)}
+                        >
+                          <Pencil size={16} className="text-green-600" />
+                        </button>
 
-          <div>
-            <label className="block mb-1 font-medium">Stock Quantity</label>
-            <input
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(Number(e.target.value))}
-              required
-              className="w-full border px-3 py-2 rounded"
-              min={0}
-            />
+                        <button
+                          className="p-2 rounded-full cursor-pointer"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} className="text-red-600" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
-            >
-              Save
-            </button>
-          </div>
-        </form>
+        </main>
       </div>
     </div>
   );

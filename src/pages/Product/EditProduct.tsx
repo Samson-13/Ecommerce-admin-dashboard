@@ -245,6 +245,7 @@ export default function EditProduct({
             </label>
             <input
               type="text"
+              value={images.join(", ")}
               onChange={(e) =>
                 setImages(
                   e.target.value
@@ -263,6 +264,7 @@ export default function EditProduct({
             </label>
             <input
               type="text"
+              value={images.join(", ")}
               onChange={(e) =>
                 setTags(
                   e.target.value
