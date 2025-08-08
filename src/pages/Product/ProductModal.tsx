@@ -16,9 +16,10 @@ export default function ProductModal({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | undefined>(undefined);
+
   const [discount, setDiscount] = useState<number | undefined>(undefined);
   const [stock, setStock] = useState<number | undefined>(undefined);
-  const [categoryId, setCategoryId] = useState(0);
+  const [categoryId, setCategoryId] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [inStock, setInStock] = useState("true");
@@ -34,8 +35,10 @@ export default function ProductModal({
     const fetchCategories = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/categories");
+
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
+        console.log(data);
         setCategories(data);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -60,6 +63,8 @@ export default function ProductModal({
       images,
       tags,
     };
+
+    console.log(product);
 
     try {
       const res = await fetch("http://localhost:3000/api/products", {
@@ -129,7 +134,7 @@ export default function ProductModal({
               </label>
               <input
                 type="number"
-                value={price}
+                value={price ?? ""}
                 placeholder="e.g. 1000"
                 onChange={(e) =>
                   setPrice(e.target.value ? Number(e.target.value) : undefined)
@@ -144,7 +149,7 @@ export default function ProductModal({
               </label>
               <input
                 type="number"
-                value={discount}
+                value={discount ?? ""}
                 placeholder="e.g. 10"
                 onChange={(e) =>
                   setDiscount(
@@ -161,7 +166,7 @@ export default function ProductModal({
               <label className="block text-sm font-medium  mb-1">Stock</label>
               <input
                 type="number"
-                value={stock}
+                value={stock ?? ""}
                 placeholder="e.g. 20"
                 onChange={(e) => setStock(Number(e.target.value))}
                 className="w-full border px-4 py-2 rounded-lg"
@@ -174,10 +179,14 @@ export default function ProductModal({
               </label>
               <select
                 value={categoryId}
-                onChange={(e) => setCategoryId(Number(e.target.value))}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  console.log("Selected categoryId:", id);
+                  setCategoryId(id);
+                }}
                 className="w-full border px-4 py-2 pr-10 rounded-lg appearance-none"
               >
-                <option value={0} disabled>
+                <option value="" disabled>
                   Select a category
                 </option>
                 {categories.map((cat) => (
