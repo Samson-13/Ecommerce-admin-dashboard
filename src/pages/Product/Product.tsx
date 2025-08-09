@@ -5,6 +5,7 @@ import AddButton from "../../components/AddButton";
 import { useEffect, useState } from "react";
 import ProductModal from "./ProductModal";
 import EditProduct from "./EditProduct";
+import ConfirmationBox from "../../components/ConfirmationBox";
 
 type Product = {
   id: number;
@@ -20,10 +21,12 @@ type Product = {
 
 export default function Products() {
   const [addOpen, setAddOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -45,6 +48,25 @@ export default function Products() {
   const openEditModal = (product: Product) => {
     setProductToEdit(product);
     setEditOpen(true);
+  };
+
+  const openDeleteModal = (product: Product) => {
+    setProductToDelete(product);
+    setOpen(true);
+  };
+
+  const onDelete = async () => {
+    if (!productToDelete) return;
+    try {
+      await fetch(`http://localhost:3000/api/products/${productToDelete.id}`, {
+        method: "DELETE",
+      });
+      fetchProducts();
+      setOpen(false);
+      setProductToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete product", err);
+    }
   };
 
   return (
@@ -135,6 +157,7 @@ export default function Products() {
                         <button
                           className="p-2 rounded-full cursor-pointer"
                           title="Delete"
+                          onClick={() => openDeleteModal(product)}
                         >
                           <Trash2 size={16} className="text-red-600" />
                         </button>
@@ -145,6 +168,17 @@ export default function Products() {
               </table>
             )}
           </div>
+
+          {/* Delete Confirmation Modal */}
+          <ConfirmationBox
+            open={open}
+            label={`Are you sure you want to Delete ${productToDelete?.name}?`}
+            onCancel={() => {
+              setOpen(false);
+              setProductToDelete(null);
+            }}
+            onConfirm={onDelete}
+          />
         </main>
       </div>
     </div>
