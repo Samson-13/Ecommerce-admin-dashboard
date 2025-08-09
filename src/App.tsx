@@ -8,6 +8,7 @@ import Users from "./pages/Users/Users";
 import Permissions from "./pages/Users/Permissions";
 import Settings from "./pages/Settings/Settings";
 import Banners from "./pages/Banners/Banners";
+import EditProduct from "./pages/Product/EditProduct";
 
 export default function App() {
   return (
@@ -18,6 +19,21 @@ export default function App() {
         {/* Store */}
         <Route path="/banners" element={<Banners />} />
         <Route path="/products" element={<Products />} />
+        <Route
+          path="/products/:id"
+          element={
+            <EditProduct
+              open={false}
+              onClose={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+              onProductUpdated={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+              productToEdit={null}
+            />
+          }
+        />
         <Route path="/categories" element={<Categories />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/reviews" element={<Reviews />} />
