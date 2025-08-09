@@ -4,6 +4,8 @@ import Header from "../../components/Header";
 import AddButton from "../../components/AddButton";
 import CategoriesModal from "./CategoriesModal";
 import { useEffect, useState } from "react";
+import ConfirmationBox from "../../components/ConfirmationBox";
+import EditCategory from "./EditCategory";
 
 type Category = {
   id: number;
@@ -14,14 +16,22 @@ type Category = {
 
 export default function Categories() {
   const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null
+  );
 
   const fetchCategories = async () => {
     setLoading(true);
     try {
       const res = await fetch("http://localhost:3000/api/categories");
       const data = await res.json();
+      console.log(data);
       setCategories(data);
     } catch (err) {
       console.error("Failed to fetch categories", err);
@@ -34,6 +44,33 @@ export default function Categories() {
     fetchCategories();
   }, []);
 
+  const openEditModal = (category: Category) => {
+    setCategoryToEdit(category);
+    setEditOpen(true);
+  };
+
+  const openDeleteModal = (category: Category) => {
+    setCategoryToDelete(category);
+    setDeleteOpen(true);
+  };
+
+  const onDelete = async () => {
+    if (!categoryToDelete) return;
+    try {
+      await fetch(
+        `http://localhost:3000/api/categories/${categoryToDelete.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      fetchCategories();
+      setDeleteOpen(false);
+      setCategoryToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete category", err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -42,15 +79,29 @@ export default function Categories() {
         <main className="flex-1 p-10">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-semibold text-gray-800">Categories</h2>
-            <AddButton label="Add Categories" onClick={() => setOpen(true)} />
+            <AddButton label="Add Category" onClick={() => setOpen(true)} />
           </div>
 
+          {/* Add Category Modal */}
           {open && (
             <CategoriesModal
               open={open}
               onClose={() => {
                 setOpen(false);
                 fetchCategories();
+              }}
+            />
+          )}
+
+          {/* Edit Category Modal */}
+          {editOpen && categoryToEdit && (
+            <EditCategory
+              open={editOpen}
+              onClose={() => setEditOpen(false)}
+              categoryToEdit={categoryToEdit}
+              onCategoryUpdated={() => {
+                fetchCategories();
+                setEditOpen(false);
               }}
             />
           )}
@@ -82,7 +133,7 @@ export default function Categories() {
                         {index + 1}
                       </td>
                       <td className="px-6 py-4 font-medium">{cat.name}</td>
-                      <td className="px-4 py-4">
+                      <td className="px-6 py-4">
                         <span
                           className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
                             cat.status
@@ -93,21 +144,21 @@ export default function Categories() {
                           {cat.status ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center gap-3">
-                          <button
-                            className="p-2 rounded-full cursor-pointer"
-                            title="Edit"
-                          >
-                            <Pencil size={16} className="text-green-600" />
-                          </button>
-                          <button
-                            className="p-2 rounded-full cursor-pointer"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} className="text-red-600" />
-                          </button>
-                        </div>
+                      <td className="px-6 py-4 flex justify-center gap-3">
+                        <button
+                          className="p-2 rounded-full cursor-pointer"
+                          title="Edit"
+                          onClick={() => openEditModal(cat)}
+                        >
+                          <Pencil size={16} className="text-green-600" />
+                        </button>
+                        <button
+                          className="p-2 rounded-full cursor-pointer"
+                          title="Delete"
+                          onClick={() => openDeleteModal(cat)}
+                        >
+                          <Trash2 size={16} className="text-red-600" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -115,6 +166,17 @@ export default function Categories() {
               </table>
             )}
           </div>
+
+          {/* Delete Confirmation Modal */}
+          <ConfirmationBox
+            open={deleteOpen}
+            label={`Are you sure you want to delete ${categoryToDelete?.name}?`}
+            onCancel={() => {
+              setDeleteOpen(false);
+              setCategoryToDelete(null);
+            }}
+            onConfirm={onDelete}
+          />
         </main>
       </div>
     </div>
