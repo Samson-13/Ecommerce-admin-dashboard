@@ -11,7 +11,7 @@ export default function CategoriesModal({
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState<string[]>([]); // multiple images
   const [status, setStatus] = useState("true");
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export default function CategoriesModal({
     const body = {
       name,
       description,
-      image,
+      images, // send array of selected images (URLs or base64 if you need upload)
       slug,
       status: status === "true",
     };
@@ -72,6 +72,7 @@ export default function CategoriesModal({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category Name
@@ -87,6 +88,7 @@ export default function CategoriesModal({
             />
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -101,20 +103,42 @@ export default function CategoriesModal({
             />
           </div>
 
+          {/* Images */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL
+              Images (max 8)
             </label>
             <input
-              placeholder="Choose an image"
-              type="text"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
+              type="file"
+              accept="image/*"
+              multiple
               disabled={loading}
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                if (files.length > 8) {
+                  alert("You can only upload up to 8 images");
+                  return;
+                }
+                setImages(files.map((file) => URL.createObjectURL(file)));
+              }}
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
+
+            {/* Horizontal Preview */}
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative">
+                  <img
+                    src={img}
+                    alt={`preview-${idx}`}
+                    className="w-24 h-24 object-cover rounded-lg border"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
+          {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
@@ -130,6 +154,7 @@ export default function CategoriesModal({
             </select>
           </div>
 
+          {/* Buttons */}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"

@@ -18,13 +18,19 @@ export default function ProductModal({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | undefined>(undefined);
-
   const [discount, setDiscount] = useState<number | undefined>(undefined);
   const [stock, setStock] = useState<number | undefined>(undefined);
   const [categoryId, setCategoryId] = useState<string>("");
+
   const [images, setImages] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [inStock, setInStock] = useState("true");
+
+  const [, setSizes] = useState<(string | number)[]>([]);
+  const [material, setMaterial] = useState<string | null>(null);
+  const [careGuide, setCareGuide] = useState<string | null>(null);
+  const [isNewArrival, setIsNewArrival] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -37,42 +43,44 @@ export default function ProductModal({
     const fetchCategories = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/categories");
-
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
-        console.log(data);
         setCategories(data);
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
     };
 
-    if (open) fetchCategories(); // only fetch when modal is open
+    if (open) fetchCategories();
   }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const product = {
-      name,
-      description,
-      price,
-      discount: discount ? Number(discount) : undefined,
-      inStock: inStock === "true",
-      stock,
-      categoryId,
-      images,
-      tags,
-    };
-
-    console.log(product);
-
     try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("price", String(price));
+      if (discount) formData.append("discount", String(discount));
+      formData.append("inStock", inStock === "true" ? "true" : "false");
+      formData.append("stock", String(stock));
+      formData.append("categoryId", categoryId);
+      tags.forEach((tag) => formData.append("tags", tag));
+
+      // append files
+      const fileInputs =
+        document.querySelector<HTMLInputElement>('input[type="file"]');
+      if (fileInputs?.files) {
+        Array.from(fileInputs.files).forEach((file) => {
+          formData.append("images", file);
+        });
+      }
+
       const res = await fetch("http://localhost:3000/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Failed to create product");
@@ -103,8 +111,9 @@ export default function ProductModal({
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
+          {/* Name + Description */}
           <div>
-            <label className="block text-sm font-medium  mb-1">
+            <label className="block text-sm font-medium mb-1">
               Product Name
             </label>
             <input
@@ -116,9 +125,8 @@ export default function ProductModal({
               className="w-full border px-4 py-2 rounded-lg"
             />
           </div>
-
           <div>
-            <label className="block text-sm font-medium  mb-1">
+            <label className="block text-sm font-medium mb-1">
               Description
             </label>
             <textarea
@@ -129,9 +137,10 @@ export default function ProductModal({
             />
           </div>
 
+          {/* Price + Discount */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium  mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Price (₹)
               </label>
               <input
@@ -146,7 +155,7 @@ export default function ProductModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium  mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Discount (%)
               </label>
               <input
@@ -163,9 +172,10 @@ export default function ProductModal({
             </div>
           </div>
 
+          {/* Stock + Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium  mb-1">Stock</label>
+              <label className="block text-sm font-medium mb-1">Stock</label>
               <input
                 type="number"
                 value={stock ?? ""}
@@ -174,18 +184,11 @@ export default function ProductModal({
                 className="w-full border px-4 py-2 rounded-lg"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium  mb-1">
-                Category
-              </label>
+              <label className="block text-sm font-medium mb-1">Category</label>
               <select
                 value={categoryId}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  console.log("Selected categoryId:", id);
-                  setCategoryId(id);
-                }}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full border px-4 py-2 pr-10 rounded-lg appearance-none"
               >
                 <option value="" disabled>
@@ -200,8 +203,9 @@ export default function ProductModal({
             </div>
           </div>
 
+          {/* Availability */}
           <div>
-            <label className="block text-sm font-medium  mb-1">
+            <label className="block text-sm font-medium mb-1">
               Availability
             </label>
             <select
@@ -214,26 +218,40 @@ export default function ProductModal({
             </select>
           </div>
 
+          {/* Images */}
           <div>
             <label className="block text-sm font-medium  mb-1">
-              Image URLs (comma separated)
+              Images (max 8)
             </label>
             <input
-              type="text"
-              onChange={(e) =>
-                setImages(
-                  e.target.value
-                    .split(",")
-                    .map((img) => img.trim())
-                    .filter(Boolean)
-                )
-              }
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                if (files.length > 8) {
+                  alert("You can only upload up to 8 images");
+                  return;
+                }
+                setImages(files.map((file) => URL.createObjectURL(file)));
+              }}
               className="w-full border px-4 py-2 rounded-lg"
             />
+            <div className="grid grid-cols-4 gap-2">
+              {images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`preview-${idx}`}
+                  className="w-20 h-20 object-cover rounded"
+                />
+              ))}
+            </div>
           </div>
 
+          {/* Tags */}
           <div>
-            <label className="block text-sm font-medium  mb-1">
+            <label className="block text-sm font-medium mb-1">
               Tags (comma separated)
             </label>
             <input
@@ -250,12 +268,66 @@ export default function ProductModal({
             />
           </div>
 
+          {/* Sizes */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Sizes (comma separated)
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. S,M,L or 38,40,42"
+              onChange={(e) =>
+                setSizes(
+                  e.target.value
+                    .split(",")
+                    .map((size) => size.trim())
+                    .filter(Boolean)
+                )
+              }
+              className="w-full border px-4 py-2 rounded-lg"
+            />
+          </div>
+
+          {/* Material */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Material</label>
+            <input
+              type="text"
+              placeholder="e.g. Cotton, Polyester"
+              value={material ?? ""}
+              onChange={(e) => setMaterial(e.target.value)}
+              className="w-full border px-4 py-2 rounded-lg"
+            />
+          </div>
+
+          {/* Care Guide */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Care Guide</label>
+            <textarea
+              placeholder="e.g. Hand wash cold, Do not bleach"
+              value={careGuide ?? ""}
+              onChange={(e) => setCareGuide(e.target.value)}
+              className="w-full border px-4 py-2 rounded-lg"
+            />
+          </div>
+
+          {/* New Arrival */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={isNewArrival}
+              onChange={(e) => setIsNewArrival(e.target.checked)}
+            />
+            <label className="text-sm font-medium">Mark as New Arrival</label>
+          </div>
+
+          {/* Actions */}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 bg-gray-100  rounded-lg hover:bg-gray-200 cursor-pointer"
+              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
             >
               Cancel
             </button>

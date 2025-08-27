@@ -1,48 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState, type JSX } from "react";
 import { ShoppingCart, RotateCcw, Wallet, Ban, DollarSign } from "lucide-react";
 
+const iconMap: Record<string, JSX.Element> = {
+  "Total Orders": <ShoppingCart className="w-6 h-6" />,
+  "Return Item": <RotateCcw className="w-6 h-6" />,
+  "Annual Budget": <Wallet className="w-6 h-6" />,
+  "Cancel Orders": <Ban className="w-6 h-6" />,
+  "Total Income": <DollarSign className="w-6 h-6" />,
+};
+
 export default function SummaryCards() {
-  const cards = [
-    {
-      label: "Total Orders",
-      value: "16,689",
-      iconBg: "bg-indigo-100",
-      iconColor: "text-indigo-600",
-      bg: "bg-gradient-to-br from-indigo-50 to-white",
-      icon: <ShoppingCart className="w-6 h-6" />,
-    },
-    {
-      label: "Return Item",
-      value: "148",
-      iconBg: "bg-yellow-100",
-      iconColor: "text-yellow-600",
-      bg: "bg-gradient-to-br from-yellow-50 to-white",
-      icon: <RotateCcw className="w-6 h-6" />,
-    },
-    {
-      label: "Annual Budget",
-      value: "$156K",
-      iconBg: "bg-teal-100",
-      iconColor: "text-teal-600",
-      bg: "bg-gradient-to-br from-teal-50 to-white",
-      icon: <Wallet className="w-6 h-6" />,
-    },
-    {
-      label: "Cancel Orders",
-      value: "64",
-      iconBg: "bg-pink-100",
-      iconColor: "text-pink-600",
-      bg: "bg-gradient-to-br from-pink-50 to-white",
-      icon: <Ban className="w-6 h-6" />,
-    },
-    {
-      label: "Total Income",
-      value: "$36,715",
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
-      bg: "bg-gradient-to-br from-green-50 to-white",
-      icon: <DollarSign className="w-6 h-6" />,
-    },
-  ];
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/dashboard")
+      .then((res) => res.json())
+      .then((result) => {
+        setCards(result.data.summaryCards); // <-- pick from summaryCards
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch dashboard data:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -53,7 +40,9 @@ export default function SummaryCards() {
         >
           <div className="flex flex-col items-center text-center space-y-3">
             <div className={`p-3 rounded-full ${card.iconBg}`}>
-              <div className={`${card.iconColor}`}>{card.icon}</div>
+              <div className={`${card.iconColor}`}>
+                {iconMap[card.label] ?? null}
+              </div>
             </div>
             <div className="text-xl font-semibold text-gray-800">
               {card.value}

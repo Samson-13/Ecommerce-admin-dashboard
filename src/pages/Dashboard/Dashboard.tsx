@@ -1,24 +1,10 @@
-// import AnnualProfitChart from "../components/AnnualProfitChart";
-// import SalesOverviewPanel from "../components/SalesOverviewPanel";
-// import SettlementsCard from "../components/SettlementsCard";
-// // import Sidebar from "../components/Sidebar";
-// // import Header from "../components/Header";
-// import SummaryCards from "../components/SummaryCards";
-// import RevenueByProductTable from "../components/RevenueByProductTable";
-// import CustomersPanel from "../components/CustomersPanel";
-// import RevenueForecastChart from "./../components/RevenueForecastChart";
-// import PerformancePanel from "../components/PerformancePanel";
-// import Sidebar from "../components/Sidebar";
-import AnnualProfitChart from "../../components/AnnualProfitChart";
-import SalesOverviewPanel from "../../components/SalesOverviewPanel";
-import SettlementsCard from "../../components/SettlementsCard";
-import RevenueByProductTable from "../../components/RevenueByProductTable";
 import CustomersPanel from "../../components/CustomersPanel";
 import PerformancePanel from "../../components/PerformancePanel";
 import RevenueForecastChart from "../../components/RevenueForecastChart";
 import SummaryCards from "../../components/SummaryCards";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
+import AnnualProfitChart from "../../components/AnnualProfitChart";
 
 export default function Dashboard() {
   return (
@@ -35,12 +21,9 @@ export default function Dashboard() {
                 <PerformancePanel />
                 <CustomersPanel />
               </div>
-              <RevenueByProductTable />
             </div>
             <div className="flex flex-col gap-6">
               <AnnualProfitChart />
-              <SalesOverviewPanel />
-              <SettlementsCard />
             </div>
           </div>
         </main>

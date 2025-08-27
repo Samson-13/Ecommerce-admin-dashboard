@@ -10,7 +10,7 @@ export default function AddButton({ label, onClick, to }: AddButtonProps) {
   const ButtonContent = (
     <button
       onClick={onClick}
-      className="px-5 py-2 bg-blue-600 text-white text-sm rounded-md shadow cursor-pointer hover:bg-blue-700 transition flex items-center gap-2"
+      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-4xl shadow cursor-pointer hover:bg-blue-700 transition flex items-center gap-2"
     >
       <Plus size={16} />
       {label}
